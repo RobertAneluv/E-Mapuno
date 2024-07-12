@@ -19,7 +19,7 @@
                 <p>Uses: {{ tree.uses }}</p>
                 <p>Tagger: {{ tree.tagger.name }}</p>
                 <p>Status: {{ tree.tagging_Stat }}</p>
-                <p>Location: {{ tree.barangay }}, {{ tree.municipality }}, {{ tree.province }}</p>
+                <p>Location: {{ tree.address }}</p>
                 <div class="row" style="float: end">
                   <button type="button" class="btn btn-primary mr-2" @click="viewLocation(tree.Lat, tree.Lng)">View Location</button>
                   <button type="button" class="btn btn-secondary" @click="printQRCode(tree)">Print QR Code</button>

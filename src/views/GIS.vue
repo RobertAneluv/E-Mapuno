@@ -26,7 +26,7 @@
             <h5>Origin: {{ tree.origin }}</h5>
             <h5>Conservation Status: {{ tree.conserve_Status }}</h5>
             <h5>Tagger: {{ tree.tagger.name }}</h5>
-            <h5>Location: {{ tree.barangay }}, {{ tree.municipality }}, {{ tree.province }}</h5>
+            <h5>Location: {{ tree.address }}</h5>
           </div>
         </InfoWindow>
       </Marker>
@@ -34,7 +34,16 @@
 
     <div>
       <div class="input-group Search">
-        <input type="search" class="form-control rounded" id="search_input" v-model="searchInput" placeholder="Search" aria-label="Search" aria-describedby="search-addon">
+        <input
+          type="search"
+          class="form-control rounded"
+          id="search_input"
+          @keydown.enter="Search"
+          v-model="searchInput"
+          placeholder="Search"
+          aria-label="Search"
+          aria-describedby="search-addon"
+        />
         <button type="button" class="btn btn-outline-primary" @click="Search">Search</button>
       </div>
 
@@ -63,8 +72,7 @@ import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { API_URL, IMAGE_URL } from '../config';
 
-
-const apiKey = 'AIzaSyBrqSrJKShAkR7iDx8NzxBE99_27mGbcBc';
+const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
 const MapCenter = ref({ lat: 16.7474, lng: 121.6169 });
 const zoom = ref(16);
 
@@ -79,8 +87,9 @@ const greenCircleIcon = ref(null);
 
 const route = useRoute();
 
-onMounted(() => { // Initialize marker icons
-  whiteCircleIcon.value = { 
+onMounted(() => {
+  // Initialize marker icons
+  whiteCircleIcon.value = {
     url: require('@/assets/WhiteCircle.png'),
     scaledSize: { width: 50, height: 45 },
   };
@@ -121,26 +130,27 @@ const Search = async () => {
 };
 
 function initMap() {
-  const searchInput = document.getElementById('search_input');
-  const autocomplete = new google.maps.places.Autocomplete(searchInput, { 
+  const searchInputElement = document.getElementById('search_input');
+  const autocomplete = new google.maps.places.Autocomplete(searchInputElement, {
     types: ['geocode'],
     componentRestrictions: { country: 'ph' }
   });
-  
-  autocomplete.addListener('place_changed', function () { 
+
+  autocomplete.addListener('place_changed', function () {
     const place = autocomplete.getPlace();
     if (place.geometry) {
       const lat = place.geometry.location.lat();
       const lng = place.geometry.location.lng();
       MapCenter.value = { lat: lat, lng: lng };
-      searchInput.value = place.formatted_address; // Set input value with selected place
+      searchInput.value = place.formatted_address; // Update searchInput with the formatted address
+      Search();
     } else {
       console.log('No geometry information available for this place.');
     }
   });
 }
 
-onMounted(() => { 
+onMounted(() => {
   if (typeof google === 'undefined') {
     console.error('Google Maps JavaScript API is not loaded.');
   } else {
@@ -148,10 +158,10 @@ onMounted(() => {
   }
 });
 
-onMounted(async () => { 
+onMounted(async () => {
   try {
-    const response = await axios.get(`${API_URL}/trees`); 
-    allTrees.value = response.data.trees; 
+    const response = await axios.get(`${API_URL}/trees`);
+    allTrees.value = response.data.trees;
     allTrees.value.forEach(tree => {
       tree.Lat = parseFloat(tree.Lat);
       tree.Lng = parseFloat(tree.Lng);
@@ -162,14 +172,13 @@ onMounted(async () => {
     const lng = parseFloat(route.query.lng);
     if (!isNaN(lat) && !isNaN(lng)) {
       MapCenter.value = { lat, lng };
-      zoom.value = 20;  // Set your desired zoom level here
+      zoom.value = 20; // Set your desired zoom level here
       openInfoWindow(tree.id); // Open info window for the specified tree ID
     }
   } catch (error) {
     console.error('Error fetching marker data:', error);
   }
 });
-
 </script>
 
 <style scoped>
