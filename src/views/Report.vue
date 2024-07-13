@@ -7,7 +7,7 @@
           <div class="col-md-3 mb-4" v-for="tree in combinedTrees" :key="tree.id">
             <div class="card position-relative">
               <button type="button" class="btn btn-primary" @click="openEditModal(tree)">Edit</button>
-              <button type="button" class="btn btn-secondary"  @click="deleteTree(tree)">Delete</button>
+              <button type="button" class="btn btn-secondary delete-btn" @click="confirmDelete(tree)">Delete</button>
               <img :src="'http://127.0.0.1:8000/'+tree.tree_pic" class="card-img-top" alt="Tree Image" style="max-width: 100%; height: 30%;">
               <div class="card-body" style="text-align: left">
                 <center><h5 class="card-title">{{ tree.id }}</h5></center>
@@ -31,7 +31,7 @@
       </div>
       <div class="col-1"></div>
     </div>
-    
+
     <!-- Edit Modal -->
     <div class="modal" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -90,6 +90,7 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 import { API_URL } from '../config';
 
 export default {
@@ -117,68 +118,94 @@ export default {
       }
     };
 
+    const confirmDelete = (tree) => {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deleteTree(tree);
+          Swal.fire('Deleted!', 'Tagged tree has been deleted.', 'success');
+        }
+      });
+    };
+
+    function successEdit() {
+      Swal.fire({
+        title: 'Changes saved successfully!',
+        icon: 'success',
+        timer: 1500, 
+        timerProgressBar: true,
+        showConfirmButton: false
+      });
+    }
+
     const viewLocation = (lat, lng) => {
       router.push({ path: '/GIS', query: { lat, lng } });
     };
 
-   const printQRCode = async (tree) => {
-  try {
-    const doc = new jsPDF();
+    const printQRCode = async (tree) => {
+      try {
+        const doc = new jsPDF();
 
-    // Create an Image element
-    const img = new Image();
-    img.crossOrigin = "Anonymous"; // Ensure cross-origin is handled properly if necessary
-    img.src = `http://127.0.0.1:8000/${tree.tree_pic}`;
+        // Create an Image element
+        const img = new Image();
+        img.crossOrigin = "Anonymous"; // Ensure cross-origin is handled properly if necessary
+        img.src = `http://127.0.0.1:8000/${tree.tree_pic}`;
 
-    // Event handler for when the image loads successfully
-    img.onload = () => {
-      const treeId = `${tree.id}`;
-      const comName = `${tree.com_Name}`;
-      const sciName = `${tree.sci_Name}`;
-      const famName = `${tree.fam_Name}`;
-      const origin = `${tree.origin}`;
-      const conserveStatus = `${tree.conserve_Status}`;
-      const taggerName = `${tree.tagger.name}`;
-      const taggingStat = `${tree.tagging_Stat}`;
-      const location = `${tree.barangay}, ${tree.municipality}, ${tree.province}`;
+        // Event handler for when the image loads successfully
+        img.onload = () => {
+          const treeId = `${tree.id}`;
+          const comName = `${tree.com_Name}`;
+          const sciName = `${tree.sci_Name}`;
+          const famName = `${tree.fam_Name}`;
+          const origin = `${tree.origin}`;
+          const conserveStatus = `${tree.conserve_Status}`;
+          const taggerName = `${tree.tagger.name}`;
+          const taggingStat = `${tree.tagging_Stat}`;
+          const location = `${tree.barangay}, ${tree.municipality}, ${tree.province}`;
 
-      // Ensure the image dimensions and quality are suitable for your use case
-      doc.text(treeId, 10, 10);
-      doc.text(`Common Name: ${comName}`, 10, 20);
-      doc.text(`Scientific Name: ${sciName}`, 10, 30);
-      doc.text(`Family Name: ${famName}`, 10, 40);
-      doc.text(`Origin: ${origin}`, 10, 50);
-      doc.text(`Conservation Status: ${conserveStatus}`, 10, 60);
-      doc.text(`Tagger: ${taggerName}`, 10, 70);
-      doc.text(`Status: ${taggingStat}`, 10, 80);
-      doc.text(`Location: ${location}`, 10, 90);
+          // Ensure the image dimensions and quality are suitable for your use case
+          doc.text(treeId, 10, 10);
+          doc.text(`Common Name: ${comName}`, 10, 20);
+          doc.text(`Scientific Name: ${sciName}`, 10, 30);
+          doc.text(`Family Name: ${famName}`, 10, 40);
+          doc.text(`Origin: ${origin}`, 10, 50);
+          doc.text(`Conservation Status: ${conserveStatus}`, 10, 60);
+          doc.text(`Tagger: ${taggerName}`, 10, 70);
+          doc.text(`Status: ${taggingStat}`, 10, 80);
+          doc.text(`Location: ${location}`, 10, 90);
 
-      // Create a canvas element to convert the image to a data URL
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
+          // Create a canvas element to convert the image to a data URL
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
 
-      // Get the data URL representation of the image
-      const dataURL = canvas.toDataURL('image/jpeg');
+          // Get the data URL representation of the image
+          const dataURL = canvas.toDataURL('image/jpeg');
 
-      // Add the image to the PDF document
-      doc.addImage(dataURL, 'JPEG', 10, 100, 180, 60);
+          // Add the image to the PDF document
+          doc.addImage(dataURL, 'JPEG', 10, 100, 180, 60);
 
-      // Save the PDF with a filename based on treeId
-      doc.save(`${treeId}_QRCode.pdf`);
+          // Save the PDF with a filename based on treeId
+          doc.save(`${treeId}_QRCode.pdf`);
+        };
+
+        // Error handler for image loading errors
+        img.onerror = (error) => {
+          console.error('Error loading image:', error);
+        };
+      } catch (error) {
+        console.error('Error printing QR code:', error);
+      }
     };
-
-    // Error handler for image loading errors
-    img.onerror = (error) => {
-      console.error('Error loading image:', error);
-    };
-  } catch (error) {
-    console.error('Error printing QR code:', error);
-  }
-};
-
 
     const openEditModal = (tree) => {
       editTree.value = { ...tree };
@@ -201,6 +228,7 @@ export default {
         }
 
         closeEditModal();
+        successEdit();
       } catch (error) {
         console.error('Error saving changes:', error);
       }
@@ -216,12 +244,11 @@ export default {
       closeEditModal,
       saveChanges,
       editTree,
-      deleteTree,
+      confirmDelete, // Use the new confirmDelete method
     };
   },
 };
 </script>
-
 
 <style scoped>
 .card {

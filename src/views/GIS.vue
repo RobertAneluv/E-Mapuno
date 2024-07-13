@@ -34,16 +34,7 @@
 
     <div>
       <div class="input-group Search">
-        <input
-          type="search"
-          class="form-control rounded"
-          id="search_input"
-          @keydown.enter="Search"
-          v-model="searchInput"
-          placeholder="Search"
-          aria-label="Search"
-          aria-describedby="search-addon"
-        />
+        <input type="search" class="form-control rounded" id="search_input" @keydown.enter="Search" v-model="searchInput" placeholder="Search" aria-label="Search" aria-describedby="search-addon"/>
         <button type="button" class="btn btn-outline-primary" @click="Search">Search</button>
       </div>
 
@@ -132,8 +123,8 @@ const Search = async () => {
 function initMap() {
   const searchInputElement = document.getElementById('search_input');
   const autocomplete = new google.maps.places.Autocomplete(searchInputElement, {
-    types: ['geocode'],
-    componentRestrictions: { country: 'ph' }
+    types: ['geocode'], // Restrict to geocoding results
+    componentRestrictions: { country: 'ph' } // Limit to Isabela province
   });
 
   autocomplete.addListener('place_changed', function () {
@@ -149,6 +140,8 @@ function initMap() {
     }
   });
 }
+
+
 
 onMounted(() => {
   if (typeof google === 'undefined') {
