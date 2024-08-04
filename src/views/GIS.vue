@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="map-container">
     <GoogleMap
       :api-key="apiKey"
-      style="width: 100%; height: 500px"
+      class="full-viewport-map"
       :center="MapCenter"
       :zoom="zoom"
       mapTypeId="satellite"
@@ -25,33 +25,40 @@
             <h5>Family Name: {{ tree.fam_Name }}</h5>
             <h5>Origin: {{ tree.origin }}</h5>
             <h5>Conservation Status: {{ tree.conserve_Status }}</h5>
-            <h5>Tagger: {{ tree.tagger.name }}</h5>
+            <h5>Tagger: {{ tree.tagger.firstname }}</h5>
             <h5>Location: {{ tree.address }}</h5>
           </div>
         </InfoWindow>
       </Marker>
     </GoogleMap>
 
-    <div>
+    <div class="search-bar-container">
       <div class="input-group Search">
-        <input type="search" class="form-control rounded" id="search_input" @keydown.enter="Search" v-model="searchInput" placeholder="Search" aria-label="Search" aria-describedby="search-addon"/>
-        <button type="button" class="btn btn-outline-primary" @click="Search">Search</button>
+        <input
+          type="search"
+          class="form-control rounded"
+          id="search_input"
+          @keydown.enter="Search"
+          v-model="searchInput"
+          placeholder="Search"
+          aria-label="Search"
+          aria-describedby="search-addon"
+        />
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          @click="Search"
+        >Search</button>
       </div>
+    </div>
 
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-1"></div>
-          <div class="col-10 mt-5" style="text-align: left">
-            <h4 v-if="searchData">LOCATION: {{ searchData.search }}</h4>
-            <h4 v-if="searchData">TAGGED TREES: {{ searchData.aliveCount }}</h4>
-            <h4 v-if="searchData">TARGET VOLUME: {{ searchData.target }}</h4>
-            <h4 v-if="searchData">CUT TREES: {{ searchData.deadCount }}</h4>
-            <h4 v-if="searchData">STATUS: {{ searchData.status }}</h4>
-            <h4 v-if="searchData">RECOMMENDATION ACTION: {{ searchData.recommendation }}</h4>
-          </div>
-          <div class="col-1"></div>
-        </div>
-      </div>
+    <div class="search-info-container">
+      <h4 v-if="searchData">LOCATION: {{ searchData.search }}</h4>
+      <h4 v-if="searchData">TAGGED TREES: {{ searchData.aliveCount }}</h4>
+      <h4 v-if="searchData">TARGET VOLUME: {{ searchData.target }}</h4>
+      <h4 v-if="searchData">CUT TREES: {{ searchData.deadCount }}</h4>
+      <h4 v-if="searchData">STATUS: {{ searchData.status }}</h4>
+      <h4 v-if="searchData">RECOMMENDATION ACTION: {{ searchData.recommendation }}</h4>
     </div>
   </div>
 </template>
@@ -141,8 +148,6 @@ function initMap() {
   });
 }
 
-
-
 onMounted(() => {
   if (typeof google === 'undefined') {
     console.error('Google Maps JavaScript API is not loaded.');
@@ -175,14 +180,53 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.TreeInfo {
-  text-align: left;
-  max-width: 25rem;
+.map-container {
+  position: relative;
+  height: 100vh; /* Full viewport height */
+  width: 73vw;  /* Full viewport width */
+  overflow: hidden; /* Prevent overflow */
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 50px;
+  flex: 1;
 }
 
-.Search {
-  margin-top: 1rem;
-  width: 30rem;
-  float: right;
+.full-viewport-map {
+  width: 100%; /* Full width */
+  height: 80%; /* Full height of the remaining container space */
+  overflow: hidden;
+}
+
+.search-bar-container {
+  padding: 10px;
+  background: white;
+  z-index: 1000;
+  position: relative;
+  width: 100%;
+}
+
+.input-group.Search {
+  max-width: 100%; /* Ensure it does not overflow */
+  margin: 0 auto;
+}
+
+.search-info-container {
+  padding: 10px;
+  background: white;
+  max-width: 100%; /* Ensure it does not overflow */
+  overflow: auto; /* Enable scroll for content overflow */
+}
+
+@media (max-width: 768px) {
+  .search-bar-container {
+    padding: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-bar-container {
+    padding: 5px;
+  }
 }
 </style>
