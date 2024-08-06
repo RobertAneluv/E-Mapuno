@@ -54,7 +54,7 @@
       try {
         const token = localStorage.getItem('token');
         if (token) {
-          const response = await axios.get('http://127.0.0.1:8000/api/auth/users', {
+          const response = await axios.get('http://127.0.0.1:8000/api/users', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           this.users = response.data;
@@ -71,7 +71,7 @@
       async approveUser(userId) {
         try {
           const token = localStorage.getItem('token');
-          await axios.post(`http://127.0.0.1:8000/api/auth/approve-user/${userId}`, {}, {
+          await axios.post(`http://127.0.0.1:8000/api/approve-user/${userId}`, {}, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           this.pendingUsers = this.pendingUsers.filter(user => user.id !== userId);
@@ -82,7 +82,7 @@
       async declineUser(userId) {
         try {
           const token = localStorage.getItem('token');
-          await axios.post(`http://127.0.0.1:8000/api/auth/decline-user/${userId}`, {}, {
+          await axios.post(`http://127.0.0.1:8000/api/decline-user/${userId}`, {}, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           this.pendingUsers = this.pendingUsers.filter(user => user.id !== userId);

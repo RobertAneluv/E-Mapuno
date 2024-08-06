@@ -36,12 +36,12 @@ export default {
     try {
       const token = localStorage.getItem('token');
       if (token) {
-        const approvedResponse = await axios.get('http://127.0.0.1:8000/api/auth/approved-users-count', {
+        const approvedResponse = await axios.get('http://127.0.0.1:8000/api/approved-users-count', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         this.approvedCount = approvedResponse.data.count;
 
-        const pendingResponse = await axios.get('http://127.0.0.1:8000/api/auth/pending-users-count', {
+        const pendingResponse = await axios.get('http://127.0.0.1:8000/api/pending-users-count', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         this.pendingCount = pendingResponse.data.count;
