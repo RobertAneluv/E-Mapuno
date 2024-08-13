@@ -7,10 +7,12 @@ import About from '@/views/AboutView.vue';
 import Report from '@/views/Report.vue';
 import Manage from '@/views/Manage.vue';
 import PendingGovernment from '@/views/PendingGovernment.vue';
+import ApprovedGovernment from '@/views/ApprovedGovernment.vue';
+import DeclinedGovernment from '@/views/DeclinedGovernment.vue';
+import PendingPrivate from '@/views/PendingPrivate.vue';
+import ApprovedPrivate from '@/views/ApprovedPrivate.vue';
+import DeclinedPrivate from '@/views/DeclinedPrivate.vue';
 import TreeCuttingAppointment from '../views/TreeCuttingAppointment.vue';
-import ApprovedGovernment from '../views/ApprovedGovernment.vue';
-import DeclinedGovernment from '../views/DeclinedGovernment.vue';
-
 
 // Define routes
 const routes = [
@@ -60,17 +62,29 @@ const routes = [
     children: [
       {
         path: 'pendingGovernment',
-        component: PendingGovernment
+        component: PendingGovernment,
       },
       {
         path: 'approvedGovernment',
-        component: ApprovedGovernment
+        component: ApprovedGovernment,
       },
       {
         path: 'declinedGovernment',
-        component: DeclinedGovernment
-      }
-    ]
+        component: DeclinedGovernment,
+      },
+      {
+        path: 'pendingPrivate',
+        component: PendingPrivate,
+      },
+      {
+        path: 'approvedPrivate',
+        component: ApprovedPrivate,
+      },
+      {
+        path: 'declinedPrivate',
+        component: DeclinedPrivate,
+      },
+    ],
   },
 ];
 

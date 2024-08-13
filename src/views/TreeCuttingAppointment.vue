@@ -1,6 +1,11 @@
 <template>
   <div class="container-fluid">
-    <TreeCuttingNavBar />
+    <div v-if="isGovernmentRoute">
+      <GovernmentNav />
+    </div>
+    <div v-else-if="isPrivateRoute">
+      <PrivateNav />
+    </div>
     <div class="row no-gutters">
       <div class="col">
         <router-view />
@@ -10,13 +15,35 @@
 </template>
 
 <script>
-import TreeCuttingNavBar from '@/components/TreeCuttingNavBar.vue';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import GovernmentNav from '@/components/GovernmentNav.vue';
+import PrivateNav from '@/components/PrivateNav.vue';
 
 export default {
-  name: 'TreeCuttingAppointment',
   components: {
-    TreeCuttingNavBar
-  }
+    GovernmentNav,
+    PrivateNav,
+  },
+  setup() {
+    const route = useRoute();
+    const isGovernmentRoute = computed(() =>
+      route.path.includes('/treecuttingappointment/pendingGovernment') ||
+      route.path.includes('/treecuttingappointment/approvedGovernment') ||
+      route.path.includes('/treecuttingappointment/declinedGovernment')
+    );
+
+    const isPrivateRoute = computed(() =>
+      route.path.includes('/treecuttingappointment/pendingPrivate') ||
+      route.path.includes('/treecuttingappointment/approvedPrivate') ||
+      route.path.includes('/treecuttingappointment/declinedPrivate')
+    );
+
+    return {
+      isGovernmentRoute,
+      isPrivateRoute,
+    };
+  },
 };
 </script>
 

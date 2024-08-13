@@ -33,7 +33,7 @@
             </div>
             <div class="dropdown-content" v-if="showDropdownTree">
               <router-link to="/treecuttingappointment/pendingGovernment" class="button"> <span class="text">Government Agency</span></router-link>
-              <router-link to="private" class="button"> <span class="text">Private Individual</span></router-link>
+              <router-link to="/treecuttingappointment/pendingPrivate" class="button"> <span class="text">Private Individual</span></router-link>
             </div>
           </div>
         </div>
